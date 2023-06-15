@@ -1,20 +1,39 @@
-import React, { useContext } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
 import UserContext from './UserContext';
 
 function Dashboard() {
-  const { user } = useContext(UserContext);
+  const [data, setData] = useState('');
+  const { token } = useContext(UserContext); // Retrieve the token from UserContext
 
-  if (!user || !user.isLoggedIn) {
-    return <Navigate to="/login" />;
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://mock-api.arikmpt.com/api/data', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.text();
+          setData(data);
+        } else {
+          // Handle error
+        }
+      } catch (error) {
+        // Handle error
+      }
+    };
+
+    fetchData();
+  }, [token]); // Add token as a dependency to re-fetch data when the token changes
 
   return (
     <div>
       <h2>Dashboard</h2>
-      <p>This is the dashboard.</p>
+      <p>{data}</p>
     </div>
   );
 }
 
-export default Dashboard
+export default Dashboard;

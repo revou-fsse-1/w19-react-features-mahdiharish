@@ -23,10 +23,14 @@ interface LoginFormValues {
 }
 
 function Login() {
-  const { setUser } = useContext(UserContext);
+  const { setUser, setToken } = useContext(UserContext);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
     resolver: yupResolver(schema),
   });
 
@@ -46,8 +50,10 @@ function Login() {
       });
 
       if (response.ok) {
+        const { token } = await response.json();
         const user = { email, isLoggedIn: true };
         setUser(user);
+        setToken(token);
         navigate('/dashboard');
       } else {
         const { error } = await response.json();

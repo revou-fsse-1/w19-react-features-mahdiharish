@@ -1,17 +1,14 @@
 import { createContext } from 'react';
 
-export interface User {
-  email: string;
-  isLoggedIn: boolean;
+interface UserContextProps {
+  token: string | null;
+  setToken: (token: string | null) => void;
+  setUser: (user: { email: string; isLoggedIn: boolean }) => void;
 }
 
-export interface UserContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-}
-
-const UserContext = createContext<UserContextType>({
-  user: null,
+const UserContext = createContext<UserContextProps>({
+  token: null,
+  setToken: () => {},
   setUser: () => {},
 });
 
