@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import UserContext from './UserContext';
 
 function Login() {
+  const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -48,6 +50,8 @@ function Login() {
       });
 
       if (response.ok) {
+        const user = { email, isLoggedIn: true };
+        setUser(user);
         navigate('/dashboard');
       } else {
         const { error } = await response.json();
