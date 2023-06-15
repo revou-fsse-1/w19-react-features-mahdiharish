@@ -1,85 +1,57 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object().shape({
+  email: yup.string().required('Email is required').email('Invalid email address'),
+  password: yup.string().required('Password is required').min(8, 'Password must be at least 8 characters long'),
+});
 
 function Register() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   const navigate = useNavigate();
 
-  const validateEmail = (email: string) => {
-    const emailPattern = /^\S+@\S+\.\S+$/;
-    return emailPattern.test(email);
-  };
-
-  const validatePassword = (password: string) => {
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return passwordPattern.test(password);
-  };
-
-  const handleRegister = async () => {
-      if (email.trim() === '' || password.trim() === '') {
-    setError('Please fill in all the required fields.');
-    return;
-  }
-
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-
-    if (!validatePassword(password)) {
-      setError(
-        'Password must be at least 8 characters long and contain both letters and numbers.'
-      );
-      return;
-    }
+  const handleRegister = async (data: { email: string; password: string }) => {
     try {
       const response = await fetch('https://mock-api.arikmpt.com/api/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        body: JSON.stringify(data),
       });
+
       if (response.ok) {
         navigate('/login');
       } else {
         const { error } = await response.json();
-        setError(error);
+        throw new Error(error);
       }
     } catch (error) {
-      setError('An error occurred. Please try again.');
+      console.error(error);
     }
   };
 
   return (
     <div>
       <h2>Register</h2>
-      <form>
+      <form onSubmit={handleSubmit(handleRegister)}>
         <div>
           <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <input type="text" {...register('email')} />
+          {errors.email && <p>{errors.email.message}</p>}
         </div>
         <div>
           <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <input type="password" {...register('password')} />
+          {errors.password && <p>{errors.password.message}</p>}
         </div>
-        <button type="button" onClick={handleRegister}>
-          Register
-        </button>
-        {error && <p>{error}</p>}
+        <button type="submit">Register</button>
       </form>
       <p>
         Already have an account? <Link to="/login">Login here</Link>.

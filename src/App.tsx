@@ -13,7 +13,11 @@ function App() {
         <Route path="/" element={<Register />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        {/* <PrivateRoute path="/dashboard" element={<Dashboard />} /> */}
+        <Route path="/dashboard" element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
