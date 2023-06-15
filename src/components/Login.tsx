@@ -65,25 +65,27 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit(handleLogin)}>
-        <div>
-          <label>Email:</label>
-          <input type="text" {...register('email')} />
-          {errors.email && <p>{errors.email.message}</p>}
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" {...register('password')} />
-          {errors.password && <p>{errors.password.message}</p>}
-        </div>
-        <button type="submit">Login</button>
-        {error && <p>{error}</p>}
-      </form>
-      <p>
-        Don't have an account? <Link to="/register">Register here</Link>.
-      </p>
+    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
+      <div className="bg-white p-8 rounded shadow-lg">
+        <h2 className="text-2xl font-bold mb-4">Login</h2>
+        <form onSubmit={handleSubmit(handleLogin)}>
+          <div className="mb-4">
+            <label className="block mb-2">Email:</label>
+            <input type="text" {...register('email')} className="border border-gray-300 px-3 py-2 rounded w-full" />
+            {errors.email && <p>{errors.email.message}</p>}
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Password:</label>
+            <input type="password" {...register('password')} className="border border-gray-300 px-3 py-2 rounded w-full" />
+            {errors.password && <p>{errors.password.message}</p>}
+          </div>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+        </form>
+        <p className="mt-4">
+          Don't have an account? <Link to="/register" className="text-blue-500">Register here</Link>.
+        </p>
+      </div>
     </div>
   );
 }
