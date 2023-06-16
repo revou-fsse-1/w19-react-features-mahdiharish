@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useNavigate, Link } from 'react-router-dom';
 
 interface Category {
   id?: string;
@@ -17,6 +18,7 @@ const schema = yup.object().shape({
 });
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -32,18 +34,18 @@ function Dashboard() {
     }
   }, []);
 
-const fetchCategories = async (token: string) => {
-  try {
-    const response = await axios.get<{ data: Category[] }>('https://mock-api.arikmpt.com/api/category', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setCategories(response.data.data);
-  } catch (error) {
-    console.error(error);
-  }
-};
+  const fetchCategories = async (token: string) => {
+    try {
+      const response = await axios.get<{ data: Category[] }>('https://mock-api.arikmpt.com/api/category', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCategories(response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleAddCategory = async (data: Category) => {
     try {
@@ -70,49 +72,48 @@ const fetchCategories = async (token: string) => {
     }
   };
 
-const handleEditCategory = async (categoryId: string, data: Category) => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await axios.put<{ data: Category }>(
-      `https://mock-api.arikmpt.com/api/category/update`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    console.log(response);
-
-    if (response.status === 200) {
-      setSuccessMessage('Category updated successfully.');
-
-      const updatedCategory: Category = {
-        ...response.data.data,
-      };
-
-      console.log(updatedCategory);
-
-      setCategories((prevCategories) => {
-        const index = prevCategories.findIndex((category) => category.id === categoryId);
-        if (index !== -1) {
-          const updatedCategories = [...prevCategories];
-          updatedCategories[index] = updatedCategory;
-          return updatedCategories;
+  const handleEditCategory = async (categoryId: string, data: Category) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put<{ data: Category }>(
+        `https://mock-api.arikmpt.com/api/category/update`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        return prevCategories;
-      });
-    } else {
-      setSuccessMessage('');
-      setErrorMessage('Failed to update category. Invalid response status.');
-    }
-  } catch (error) {
-    setSuccessMessage('');
-    setErrorMessage('Failed to update category. An error occurred.');
-  }
-};
+      );
 
+      console.log(response);
+
+      if (response.status === 200) {
+        setSuccessMessage('Category updated successfully.');
+
+        const updatedCategory: Category = {
+          ...response.data.data,
+        };
+
+        console.log(updatedCategory);
+
+        setCategories((prevCategories) => {
+          const index = prevCategories.findIndex((category) => category.id === categoryId);
+          if (index !== -1) {
+            const updatedCategories = [...prevCategories];
+            updatedCategories[index] = updatedCategory;
+            return updatedCategories;
+          }
+          return prevCategories;
+        });
+      } else {
+        setSuccessMessage('');
+        setErrorMessage('Failed to update category. Invalid response status.');
+      }
+    } catch (error) {
+      setSuccessMessage('');
+      setErrorMessage('Failed to update category. An error occurred.');
+    }
+  };
 
   const handleDeleteCategory = async (categoryId: string) => {
     try {
@@ -129,6 +130,10 @@ const handleEditCategory = async (categoryId: string, data: Category) => {
       setErrorMessage('Failed to delete category.');
       console.error(error);
     }
+  };
+
+  const handleDetails = (categoryId: string) => {
+    navigate(`/category/${categoryId}`);
   };
 
   return (
@@ -176,6 +181,9 @@ const handleEditCategory = async (categoryId: string, data: Category) => {
                 <td className="border-b py-2 px-2 md:px-4">
                   <button onClick={() => handleEditCategory(category.id || '', category)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2">Edit</button>
                   <button onClick={() => handleDeleteCategory(category.id!)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Delete</button>
+                  <Link to={`/category/${category.id}`} className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700">
+                    Details
+                  </Link>
                 </td>
               </tr>
             ))}
