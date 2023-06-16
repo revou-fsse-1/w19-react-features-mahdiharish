@@ -6,10 +6,8 @@ interface UserContextProps {
   setUser: (user: { email: string; isLoggedIn: boolean }) => void;
 }
 
-const UserContext = createContext<UserContextProps>({
+export const UserContext = createContext<UserContextProps>({
   token: null,
   setToken: () => {},
   setUser: () => {},
 });
-
-export default UserContext;

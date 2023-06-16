@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { UserContext } from '../UserContext';
 
 interface Category {
   id?: string;
@@ -25,22 +26,34 @@ function Dashboard() {
     resolver: yupResolver<Category>(schema),
   });
 
+  const { token } = useContext(UserContext);
+
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [token]);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get<Category[]>('https://mock-api.arikmpt.com/api/category'); // harus kasih token
+const fetchCategories = async () => {
+  try {
+    if (token) {
+      const response = await axios.get<Category[]>('https://mock-api.arikmpt.com/api/category', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setCategories(response.data);
-    } catch (error) {
-      console.error(error);
     }
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const handleAddCategory = async (data: Category) => {
     try {
-      const response = await axios.post<Category>('https://mock-api.arikmpt.com/api/category/create', data);
+      const response = await axios.post<Category>('https://mock-api.arikmpt.com/api/category/create', data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setSuccessMessage('Category added successfully.');
       setCategories([...categories, response.data]);
       reset();
@@ -52,7 +65,11 @@ function Dashboard() {
 
   const handleDeleteCategory = async (categoryId: string) => {
     try {
-      await axios.delete(`https://mock-api.arikmpt.com/api/category/${categoryId}`);
+      await axios.delete(`https://mock-api.arikmpt.com/api/category/${categoryId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setSuccessMessage('Category deleted successfully.');
       const updatedCategories = categories.filter(category => category.id !== categoryId);
       setCategories(updatedCategories);

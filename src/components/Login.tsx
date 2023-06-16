@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import UserContext from './UserContext';
+import { UserContext } from './UserContext';
 
 const schema = yup.object().shape({
   email: yup.string().email('Please enter a valid email address.').required('Email is required.'),
@@ -54,7 +54,7 @@ function Login() {
         const user = { email, isLoggedIn: true };
         setUser(user);
         setToken(token);
-        // add localstorage setItem
+        localStorage.setItem('token', token); // Store token in local storage
         navigate('/dashboard');
       } else {
         const { error } = await response.json();

@@ -1,22 +1,15 @@
-import React, { useState } from 'react';
-import UserContext from './UserContext';
+import { createContext } from 'react';
 
-interface UserProviderProps {
-  children: React.ReactNode;
+interface UserContextProps {
+  token: string | null;
+  setToken: (token: string | null) => void;
+  setUser: (user: { email: string; isLoggedIn: boolean }) => void;
 }
 
-const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<{ email: string; isLoggedIn: boolean }>({
-    email: '',
-    isLoggedIn: false,
-  });
+const UserContext = createContext<UserContextProps>({
+  token: null,
+  setToken: () => {},
+  setUser: () => {},
+});
 
-  return (
-    <UserContext.Provider value={{ token, setToken, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
-};
-
-export default UserProvider;
+export default UserContext;
