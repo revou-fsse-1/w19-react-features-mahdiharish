@@ -1,54 +1,56 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { UserContext } from '../UserContext';
 
 interface Category {
   id?: string;
   name: string;
-  status: string;
+  is_active: boolean;
 }
 
 const schema = yup.object().shape({
   id: yup.string().optional(),
   name: yup.string().required('Name is required'),
-  status: yup.string().required('Status is required'),
+  is_active: yup.boolean().required('Status is required'),
 });
 
 function Dashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  console.log(categories);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Category>({
     resolver: yupResolver<Category>(schema),
   });
 
-  const { token } = useContext(UserContext);
-
   useEffect(() => {
-    fetchCategories();
-  }, [token]);
-
-const fetchCategories = async () => {
-  try {
+    const token = localStorage.getItem('token');
     if (token) {
-      const response = await axios.get<Category[]>('https://mock-api.arikmpt.com/api/category', {
+      fetchCategories(token);
+    }
+  }, []);
+
+  const fetchCategories = async (token: string) => {
+    try {
+      const response = await axios.get<{ data: Category[] }>('https://mock-api.arikmpt.com/api/category', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setCategories(response.data);
+      console.log(response);
+      setCategories(response.data.data);
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
+
 
   const handleAddCategory = async (data: Category) => {
     try {
+      const token = localStorage.getItem('token');
       const response = await axios.post<Category>('https://mock-api.arikmpt.com/api/category/create', data, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,6 +67,7 @@ const fetchCategories = async () => {
 
   const handleDeleteCategory = async (categoryId: string) => {
     try {
+      const token = localStorage.getItem('token');
       await axios.delete(`https://mock-api.arikmpt.com/api/category/${categoryId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -91,13 +94,13 @@ const fetchCategories = async () => {
             {errors.name && <p className="text-red-500">{errors.name.message}</p>}
           </div>
           <div className="mb-4">
-            <label htmlFor="status" className="block mb-2">Status:</label>
-            <select id="status" {...register('status')} className="border border-gray-300 rounded px-2 py-1 w-full">
+            <label htmlFor="is_active" className="block mb-2">Status:</label>
+            <select id="is_active" {...register('is_active')} className="border border-gray-300 rounded px-2 py-1 w-full">
               <option value="">Select status</option>
-              <option value="Active">Active</option>
-              <option value="Deactive">Deactive</option>
+              <option value="true">Active</option>
+              <option value="false">Deactive</option>
             </select>
-            {errors.status && <p className="text-red-500">{errors.status.message}</p>}
+            {errors.is_active && <p className="text-red-500">{errors.is_active.message}</p>}
           </div>
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Add Category</button>
           {successMessage && <p className="text-green-500 my-2">{successMessage}</p>}
@@ -120,7 +123,7 @@ const fetchCategories = async () => {
               <tr key={category.id}>
                 <td className="border-b py-2 px-2 md:px-4">{category.id}</td>
                 <td className="border-b py-2 px-2 md:px-4">{category.name}</td>
-                <td className="border-b py-2 px-2 md:px-4">{category.status}</td>
+                <td className="border-b py-2 px-2 md:px-4">{category.is_active ? 'Active' : 'Inactive'}</td>
                 <td className="border-b py-2 px-2 md:px-4">
                   <button className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2">Edit</button>
                   <button onClick={() => handleDeleteCategory(category.id!)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Delete</button>

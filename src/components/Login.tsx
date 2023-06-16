@@ -1,19 +1,89 @@
-import { useContext, useState } from 'react';
+// import { useContext, useState } from 'react';
+// import { Link, useNavigate } from 'react-router-dom';
+// import { useForm } from 'react-hook-form';
+// import { yupResolver } from '@hookform/resolvers/yup';
+// import * as yup from 'yup';
+// import { UserContext } from './UserContext';
+
+// const schema = yup.object().shape({
+//   email: yup.string().email('Please enter a valid email address.').required('Email is required.'),
+//   password: yup
+//     .string()
+//     .min(8, 'Password must be at least 8 characters long.')
+//     .matches(
+//       /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+//       'Password must contain at least one letter and one number.'
+//     )
+//     .required('Password is required.'),
+// });
+
+// interface LoginFormValues {
+//   email: string;
+//   password: string;
+// }
+
+// function Login() {
+//   const { setUser, setToken } = useContext(UserContext);
+//   const [error, setError] = useState('');
+//   const navigate = useNavigate();
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors },
+//   } = useForm<LoginFormValues>({
+//     resolver: yupResolver(schema),
+//   });
+
+//   const handleLogin = async (data: LoginFormValues) => {
+//     const { email, password } = data;
+
+//     try {
+//       const response = await fetch('https://mock-api.arikmpt.com/api/user/login', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           email,
+//           password,
+//         }),
+//       });
+
+//       if (response.ok) {
+//         const { token } = await response.json();
+//         const user = { email, isLoggedIn: true };
+//         setUser(user);
+//         setToken(token);
+//         localStorage.setItem('token', token);
+//         console.log(token) // Store token in local storage
+//         navigate('/dashboard');
+//       } else {
+//         const { error } = await response.json();
+//         setError(error);
+//       }
+//     } catch (error) {
+//       setError('An error occurred. Please try again.');
+//     }
+//   };
+
+import { useState } from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { UserContext } from './UserContext';
+
+interface TokenResponse {
+  data: any;
+  token: string;
+}
 
 const schema = yup.object().shape({
   email: yup.string().email('Please enter a valid email address.').required('Email is required.'),
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters long.')
-    .matches(
-      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-      'Password must contain at least one letter and one number.'
-    )
+    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, 'Password must contain at least one letter and one number.')
     .required('Password is required.'),
 });
 
@@ -23,9 +93,8 @@ interface LoginFormValues {
 }
 
 function Login() {
-  const { setUser, setToken } = useContext(UserContext);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [error, setError] = useState('');
   const {
     register,
     handleSubmit,
@@ -34,36 +103,28 @@ function Login() {
     resolver: yupResolver(schema),
   });
 
-  const handleLogin = async (data: LoginFormValues) => {
-    const { email, password } = data;
+const handleLogin = async (data: LoginFormValues) => {
+  const { email, password } = data;
 
-    try {
-      const response = await fetch('https://mock-api.arikmpt.com/api/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+  try {
+    const response = await axios.post<TokenResponse>('https://mock-api.arikmpt.com/api/user/login', {
+      email,
+      password,
+    });
 
-      if (response.ok) {
-        const { token } = await response.json();
-        const user = { email, isLoggedIn: true };
-        setUser(user);
-        setToken(token);
-        localStorage.setItem('token', token); // Store token in local storage
-        navigate('/dashboard');
-      } else {
-        const { error } = await response.json();
-        setError(error);
-      }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
+    if (response.status === 200) {
+      const { token } = response.data.data; // Get the token from the response
+      localStorage.setItem('token', token); // Store the token in local storage
+      navigate('/dashboard');
+    } else {
+      setError('Failed to login.');
     }
-  };
+  } catch (error) {
+    setError('An error occurred. Please try again.');
+    console.error(error);
+  }
+};
+
 
   return (
     <div className="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -92,3 +153,4 @@ function Login() {
 }
 
 export default Login;
+
