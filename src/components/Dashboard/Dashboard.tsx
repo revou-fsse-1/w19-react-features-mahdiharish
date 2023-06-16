@@ -180,8 +180,8 @@ function Dashboard() {
                 <td className="border-b py-2 px-2 md:px-4">{category.is_active ? 'Active' : 'Inactive'}</td>
                 <td className="border-b py-2 px-2 md:px-4">
                   <button onClick={() => handleEditCategory(category.id || '', category)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2">Edit</button>
-                  <button onClick={() => handleDeleteCategory(category.id!)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Delete</button>
-                  <Link to={`/category/${category.id}`} className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700">
+                  <button onClick={() => handleDeleteCategory(category.id!)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700 mr-2">Delete</button>
+                  <Link to={`/category/${category.id}`} className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700 mr-2">
                     Details
                   </Link>
                 </td>

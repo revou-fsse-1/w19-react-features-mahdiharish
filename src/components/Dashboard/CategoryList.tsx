@@ -13,16 +13,16 @@ function CategoryDetails() {
   const [category, setCategory] = useState<Category | null>(null);
 
   useEffect(() => {
-    console.log(categoryId); // Add this line to log the categoryId
+    console.log(categoryId);
 
-    const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
     const fetchCategory = async () => {
       try {
         const response = await axios.get<{ data: Category }>(
           `https://mock-api.arikmpt.com/api/category/${categoryId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Include the token in the request headers
+              Authorization: `Bearer ${token}`,
             },
           }
         );
