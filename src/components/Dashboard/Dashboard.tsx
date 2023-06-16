@@ -63,11 +63,11 @@ function Dashboard() {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto flex flex-col items-center">
       <h1 className="text-3xl font-bold my-6">Dashboard Page</h1>
       <div className="my-6">
         <h2 className="text-xl font-semibold mb-4">Add New Category</h2>
-        <form onSubmit={handleSubmit(handleAddCategory)} className="w-64">
+        <form onSubmit={handleSubmit(handleAddCategory)} className="w-full md:w-64">
           <div className="mb-4">
             <label htmlFor="name" className="block mb-2">Name:</label>
             <input type="text" id="name" {...register('name')} className="border border-gray-300 rounded px-2 py-1 w-full" />
@@ -82,29 +82,29 @@ function Dashboard() {
             </select>
             {errors.status && <p className="text-red-500">{errors.status.message}</p>}
           </div>
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Add Category</button>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Add Category</button>
           {successMessage && <p className="text-green-500 my-2">{successMessage}</p>}
           {errorMessage && <p className="text-red-500 my-2">{errorMessage}</p>}
         </form>
       </div>
-      <div>
+      <div className="my-6">
         <h2 className="text-xl font-semibold mb-4">Categories</h2>
         <table className="w-full border border-gray-300">
           <thead>
             <tr>
-              <th className="border-b py-2 px-4">ID</th>
-              <th className="border-b py-2 px-4">Name</th>
-              <th className="border-b py-2 px-4">Status</th>
-              <th className="border-b py-2 px-4">Action</th>
+              <th className="border-b py-2 px-2 md:px-4">ID</th>
+              <th className="border-b py-2 px-2 md:px-4">Name</th>
+              <th className="border-b py-2 px-2 md:px-4">Status</th>
+              <th className="border-b py-2 px-2 md:px-4">Action</th>
             </tr>
           </thead>
           <tbody>
             {categories.map(category => (
               <tr key={category.id}>
-                <td className="border-b py-2 px-4">{category.id}</td>
-                <td className="border-b py-2 px-4">{category.name}</td>
-                <td className="border-b py-2 px-4">{category.status}</td>
-                <td className="border-b py-2 px-4">
+                <td className="border-b py-2 px-2 md:px-4">{category.id}</td>
+                <td className="border-b py-2 px-2 md:px-4">{category.name}</td>
+                <td className="border-b py-2 px-2 md:px-4">{category.status}</td>
+                <td className="border-b py-2 px-2 md:px-4">
                   <button className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2">Edit</button>
                   <button onClick={() => handleDeleteCategory(category.id!)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Delete</button>
                 </td>

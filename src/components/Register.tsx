@@ -17,14 +17,16 @@ function Register() {
 
   const handleRegister = async (data: { email: string; password: string }) => {
     try {
+      console.log(data)
       const response = await fetch('https://mock-api.arikmpt.com/api/user/register', {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
-
+      console.log(response);
       if (response.ok) {
         navigate('/login');
       } else {
