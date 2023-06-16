@@ -72,48 +72,61 @@ function Dashboard() {
     }
   };
 
-  const handleEditCategory = async (categoryId: string, data: Category) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put<{ data: Category }>(
-        `https://mock-api.arikmpt.com/api/category/update`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+const handleEditCategory = async (categoryId: string, data: Category) => {
+  try {
+    const token = localStorage.getItem('token');
 
-      console.log(response);
-
-      if (response.status === 200) {
-        setSuccessMessage('Category updated successfully.');
-
-        const updatedCategory: Category = {
-          ...response.data.data,
-        };
-
-        console.log(updatedCategory);
-
-        setCategories((prevCategories) => {
-          const index = prevCategories.findIndex((category) => category.id === categoryId);
-          if (index !== -1) {
-            const updatedCategories = [...prevCategories];
-            updatedCategories[index] = updatedCategory;
-            return updatedCategories;
-          }
-          return prevCategories;
-        });
-      } else {
-        setSuccessMessage('');
-        setErrorMessage('Failed to update category. Invalid response status.');
+    // Step 1: Fetch the category data to be edited
+    const fetchResponse = await axios.get<{ data: Category }>(
+      `https://mock-api.arikmpt.com/api/category/${categoryId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    } catch (error) {
+    );
+    const existingCategory = fetchResponse.data.data;
+
+    // Step 2: Update the category data
+    const updatedCategory: Category = {
+      ...existingCategory,
+      ...data,
+    };
+
+    // Step 3: Post the updated category data
+    const updateResponse = await axios.put<{ data: Category }>(
+      `https://mock-api.arikmpt.com/api/category/update`,
+      updatedCategory,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(updateResponse);
+
+    if (updateResponse.status === 200) {
+      setSuccessMessage('Category updated successfully.');
+      setCategories((prevCategories) => {
+        const index = prevCategories.findIndex((category) => category.id === categoryId);
+        if (index !== -1) {
+          const updatedCategories = [...prevCategories];
+          updatedCategories[index] = updatedCategory;
+          return updatedCategories;
+        }
+        return prevCategories;
+      });
+    } else {
       setSuccessMessage('');
-      setErrorMessage('Failed to update category. An error occurred.');
+      setErrorMessage('Failed to update category. Invalid response status.');
     }
-  };
+  } catch (error) {
+    setSuccessMessage('');
+    setErrorMessage('Failed to update category. An error occurred.');
+  }
+};
+
 
   const handleDeleteCategory = async (categoryId: string) => {
     try {
