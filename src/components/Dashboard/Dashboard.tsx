@@ -20,7 +20,6 @@ function Dashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  console.log(categories);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Category>({
     resolver: yupResolver<Category>(schema),
@@ -33,33 +32,41 @@ function Dashboard() {
     }
   }, []);
 
-  const fetchCategories = async (token: string) => {
-    try {
-      const response = await axios.get<{ data: Category[] }>('https://mock-api.arikmpt.com/api/category', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response);
-      setCategories(response.data.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+const fetchCategories = async (token: string) => {
+  try {
+    const response = await axios.get<{ data: Category[] }>('https://mock-api.arikmpt.com/api/category', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data); // Log the response data to the console
+    setCategories(response.data.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const handleAddCategory = async (data: Category) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post<Category>('https://mock-api.arikmpt.com/api/category/create', data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post<{ data: Category }>(
+        'https://mock-api.arikmpt.com/api/category/create',
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setSuccessMessage('Category added successfully.');
-      setCategories([...categories, response.data]);
+      const newCategory: Category = {
+        ...response.data.data,
+      };
+      console.log(newCategory);
+      setCategories((prevCategories) => [...prevCategories, newCategory]);
       reset();
     } catch (error) {
+      setSuccessMessage('');
       setErrorMessage('Failed to add category.');
       console.error(error);
     }
@@ -98,7 +105,7 @@ function Dashboard() {
             <select id="is_active" {...register('is_active')} className="border border-gray-300 rounded px-2 py-1 w-full">
               <option value="">Select status</option>
               <option value="true">Active</option>
-              <option value="false">Deactive</option>
+              <option value="false">Inactive</option>
             </select>
             {errors.is_active && <p className="text-red-500">{errors.is_active.message}</p>}
           </div>
@@ -119,8 +126,8 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {categories.map(category => (
-              <tr key={category.id}>
+            {categories.map((category) => (
+              <tr key={category.id ?? ''}>
                 <td className="border-b py-2 px-2 md:px-4">{category.id}</td>
                 <td className="border-b py-2 px-2 md:px-4">{category.name}</td>
                 <td className="border-b py-2 px-2 md:px-4">{category.is_active ? 'Active' : 'Inactive'}</td>
