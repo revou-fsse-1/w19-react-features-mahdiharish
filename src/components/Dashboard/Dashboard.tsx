@@ -39,7 +39,6 @@ const fetchCategories = async (token: string) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data); // Log the response data to the console
     setCategories(response.data.data);
   } catch (error) {
     console.error(error);
@@ -62,7 +61,6 @@ const fetchCategories = async (token: string) => {
       const newCategory: Category = {
         ...response.data.data,
       };
-      console.log(newCategory);
       setCategories((prevCategories) => [...prevCategories, newCategory]);
       reset();
     } catch (error) {
@@ -71,6 +69,50 @@ const fetchCategories = async (token: string) => {
       console.error(error);
     }
   };
+
+const handleEditCategory = async (categoryId: string, data: Category) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.put<{ data: Category }>(
+      `https://mock-api.arikmpt.com/api/category/update`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response);
+
+    if (response.status === 200) {
+      setSuccessMessage('Category updated successfully.');
+
+      const updatedCategory: Category = {
+        ...response.data.data,
+      };
+
+      console.log(updatedCategory);
+
+      setCategories((prevCategories) => {
+        const index = prevCategories.findIndex((category) => category.id === categoryId);
+        if (index !== -1) {
+          const updatedCategories = [...prevCategories];
+          updatedCategories[index] = updatedCategory;
+          return updatedCategories;
+        }
+        return prevCategories;
+      });
+    } else {
+      setSuccessMessage('');
+      setErrorMessage('Failed to update category. Invalid response status.');
+    }
+  } catch (error) {
+    setSuccessMessage('');
+    setErrorMessage('Failed to update category. An error occurred.');
+  }
+};
+
 
   const handleDeleteCategory = async (categoryId: string) => {
     try {
@@ -132,7 +174,7 @@ const fetchCategories = async (token: string) => {
                 <td className="border-b py-2 px-2 md:px-4">{category.name}</td>
                 <td className="border-b py-2 px-2 md:px-4">{category.is_active ? 'Active' : 'Inactive'}</td>
                 <td className="border-b py-2 px-2 md:px-4">
-                  <button className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2">Edit</button>
+                  <button onClick={() => handleEditCategory(category.id || '', category)} className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700 mr-2">Edit</button>
                   <button onClick={() => handleDeleteCategory(category.id!)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Delete</button>
                 </td>
               </tr>
