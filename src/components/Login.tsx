@@ -54,6 +54,7 @@ function Login() {
         const user = { email, isLoggedIn: true };
         setUser(user);
         setToken(token);
+        // add localstorage setItem
         navigate('/dashboard');
       } else {
         const { error } = await response.json();

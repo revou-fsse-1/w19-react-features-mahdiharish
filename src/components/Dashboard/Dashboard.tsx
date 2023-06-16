@@ -31,7 +31,7 @@ function Dashboard() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get<Category[]>('https://mock-api.arikmpt.com/api/category');
+      const response = await axios.get<Category[]>('https://mock-api.arikmpt.com/api/category'); // harus kasih token
       setCategories(response.data);
     } catch (error) {
       console.error(error);
