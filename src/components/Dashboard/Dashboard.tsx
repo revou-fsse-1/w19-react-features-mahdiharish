@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -34,7 +34,7 @@ function Dashboard() {
     }
   }, []);
 
-  const fetchCategories = async (token: string) => {
+  const fetchCategories = useCallback(async (token: string) => {
     try {
       const response = await axios.get<{ data: Category[] }>('https://mock-api.arikmpt.com/api/category', {
         headers: {
@@ -45,9 +45,9 @@ function Dashboard() {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
 
-  const handleAddCategory = async (data: Category) => {
+  const handleAddCategory = useCallback(async (data: Category) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post<{ data: Category }>(
@@ -70,9 +70,9 @@ function Dashboard() {
       setErrorMessage('Failed to add category.');
       console.error(error);
     }
-  };
+  }, [reset]);
 
-  const handleDeleteCategory = async (categoryId: string) => {
+  const handleDeleteCategory = useCallback(async (categoryId: string) => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`https://mock-api.arikmpt.com/api/category/${categoryId}`, {
@@ -87,11 +87,11 @@ function Dashboard() {
       setErrorMessage('Failed to delete category.');
       console.error(error);
     }
-  };
+  }, [categories]);
 
-  const handleEditCategory = (categoryId: string) => {
-  navigate(`/category/edit/${categoryId}`);
-};
+  const handleEditCategory = useCallback((categoryId: string) => {
+    navigate(`/category/edit/${categoryId}`);
+  }, [navigate]);
 
   return (
     <div className="container mx-auto flex flex-col items-center">
